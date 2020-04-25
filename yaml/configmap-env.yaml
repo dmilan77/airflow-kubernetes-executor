@@ -1,0 +1,45 @@
+# Source: airflow/templates/configmap-env.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "airflow-env"
+  labels:
+    app: airflow
+    chart: airflow-0.1
+    release: airflow
+    heritage: Helm
+data:
+  ## Force UTC timezone
+  TZ: Etc/UTC
+  ## Postgres DB configuration
+  POSTGRES_HOST: "postgres-service.default.svc.cluster.local"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "airflow"
+  # Configure puckel's docker-airflow entrypoint
+  EXECUTOR: "Kubernetes"
+  FERNET_KEY: "SKJOM8uzLY6xAxPt8qFN2BcprPl-iPz_tMt9ktmfd_E="
+  DO_WAIT_INITDB: "false"
+  ## Custom Airflow settings
+  AIRFLOW__CORE__DONOT_PICKLE: "false"
+  AIRFLOW__CORE__DAGS_FOLDER: "/usr/local/airflow"
+  AIRFLOW__CORE__BASE_LOG_FOLDER: "/usr/local/airflow/logs"
+  AIRFLOW__CORE__DAG_PROCESSOR_MANAGER_LOG_LOCATION: "/usr/local/airflow/logs/dag_processor_manager/dag_processor_manager.log"
+  AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY: "/usr/local/airflow/logs/scheduler"
+  AIRFLOW__WEBSERVER__BASE_URL: "http://localhost:8080"
+  # Disabling XCom pickling for forward compatibility
+  AIRFLOW__CORE__ENABLE_XCOM_PICKLING: "false"
+  # Note: changing `Values.airflow.config` won't change the configmap checksum and so won't make
+  # the pods to restart
+  AIRFLOW__CORE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://postgres:abc123@postgres-service.default.svc.cluster.local:5432/airflow"
+  AIRFLOW__KUBERNETES__DELETE_WORKER_PODS: "false"
+  AIRFLOW__KUBERNETES__GIT_BRANCH: "master"
+  AIRFLOW__KUBERNETES__GIT_DAGS_FOLDER_MOUNT_POINT: "/usr/local/airflow"
+  AIRFLOW__KUBERNETES__GIT_REPO: "https://github.com/dmilan77/test-airflow-dag.git"
+  AIRFLOW__KUBERNETES__GIT_SYNC_DEST: "dags"
+  AIRFLOW__KUBERNETES__GIT_SYNC_RUN_AS_USER: "0"
+  AIRFLOW__KUBERNETES__KUBE_CLIENT_REQUEST_ARGS: "{\"_request_timeout\":60}"
+  AIRFLOW__KUBERNETES__NAMESPACE: "airflow"
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_IMAGE_PULL_POLICY: "IfNotPresent"
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY: "dmilan/docker-airflow-v2"
+  AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG: "v1"
+  AIRFLOW__KUBERNETES__WORKER_SERVICE_ACCOUNT_NAME: "airflow"

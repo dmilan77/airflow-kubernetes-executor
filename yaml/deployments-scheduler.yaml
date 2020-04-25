@@ -1,0 +1,77 @@
+# Source: airflow/templates/deployments-scheduler.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  labels:
+    app: airflow
+    component: scheduler
+    chart: airflow-0.1
+    release: airflow
+    heritage: Helm
+spec:
+  replicas: 1
+  strategy:
+    # Kill the scheduler as soon as possible. It will restart quickly with all the workers,
+    # minimizing the time they are not synchronized.
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 100%
+  selector:
+    matchLabels:
+      app: airflow
+      component: scheduler
+      release: airflow
+  template:
+    metadata:
+      labels:
+        app: airflow
+        component: scheduler
+        release: airflow
+    spec:
+      restartPolicy: Always
+      serviceAccountName: airflow
+      containers:
+      # - name: git-sync
+      #   image: k8s.gcr.io/git-sync:v3.1.1
+        - name: airflow-scheduler
+          image: dmilan/docker-airflow-v2:v1
+          imagePullPolicy: IfNotPresent
+          envFrom:
+          - configMapRef:
+              name: "airflow-env"
+          env:          
+            - name: POSTGRES_USER
+              value: "postgres"
+          resources:
+            {}
+          volumeMounts:
+            - name: scripts
+              mountPath: /usr/local/scripts
+            - mountPath: /usr/local/airflow
+              name: synchronised-dags
+          args:
+            - "bash"
+            - "-c"
+            - >
+              echo 'waiting 10s...' &&
+              sleep 10 &&
+              mkdir -p /usr/local/airflow/.local/bin &&
+              export PATH=/usr/local/airflow/.local/bin:$PATH &&
+              echo "executing initdb" &&
+              airflow initdb &&
+              echo "executing scheduler" &&
+              airflow scheduler -n -1
+
+          
+      volumes:
+        - name: scripts
+          configMap:
+            name: airflow-scripts
+            defaultMode: 0755
+        - name: dags-data
+          emptyDir: {}
+        - name: synchronised-dags
+          emptyDir: {}
+          
