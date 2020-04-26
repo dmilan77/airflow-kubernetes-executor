@@ -19,14 +19,12 @@ spec:
     matchLabels:
       app: airflow
       component: web
-      release: airflow
   template:
     metadata:
       annotations: {}
       labels:
         app: airflow
         component: web
-        release: airflow
     spec:
       restartPolicy: Always
       serviceAccountName: airflow
@@ -54,8 +52,7 @@ spec:
           mountPath: /opt/airflow/airflow.cfg
           subPath: airflow.cfg  
         - name: dag-folder
-          mountPath: /git
-          readOnly: true
+          mountPath: /opt/airflow
         imagePullPolicy: IfNotPresent
         ports:
           - name: web
@@ -72,8 +69,6 @@ spec:
           - "-c"
           - >
             echo 'executing webserver...' &&
-            rm -rf /opt/airflow/dags &&
-            ln -s /git/sync/dags /opt/airflow/dags &&
             airflow webserver
         livenessProbe:
           httpGet:

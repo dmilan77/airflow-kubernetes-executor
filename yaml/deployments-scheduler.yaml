@@ -36,7 +36,7 @@ spec:
           image: apache/airflow:1.10.10
           volumeMounts:
           - name: dag-folder
-            mountPath: /git          
+            mountPath: /opt/airflow  
           - name: airflow-configmap
             mountPath: /opt/airflow/airflow.cfg
             subPath: airflow.cfg
@@ -51,9 +51,6 @@ spec:
             - "bash"
             - "-c"
             - >
-              echo "setting up dag mount ... " &&
-              rm -rf /opt/airflow/dags &&
-              ln -s /git/sync/dags /opt/airflow/dags &&
               echo "executing initdb" &&
               airflow initdb &&
               echo "executing scheduler" &&
