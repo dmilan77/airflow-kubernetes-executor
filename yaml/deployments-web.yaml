@@ -36,6 +36,10 @@ spec:
       containers:
         - name: airflow-web
           image: apache/airflow:1.10.10
+          volumeMounts:
+          - name: airflow-configmap
+            mountPath: /opt/airflow/airflow.cfg
+            subPath: airflow.cfg          
           imagePullPolicy: IfNotPresent
           ports:
             - name: web
@@ -47,21 +51,10 @@ spec:
           env:          
             - name: POSTGRES_USER
               value: "postgres"
-          resources:
-            {}
-          volumeMounts:
-            - name: scripts
-              mountPath: /usr/local/scripts
-            - mountPath: /usr/local/airflow
-              name: synchronised-dags
-          args:
+          command:
             - "bash"
             - "-c"
             - >
-              echo 'waiting 20s...' &&
-              sleep 20 &&
-              mkdir -p /usr/local/airflow/.local/bin &&
-              export PATH=/usr/local/airflow/.local/bin:$PATH &&
               echo 'executing webserver...' &&
               airflow webserver
           livenessProbe:
@@ -86,11 +79,6 @@ spec:
         # - image: k8s.gcr.io/git-sync:v3.1.1
         #   name: git-sync
       volumes:
-        - name: scripts
+        - name: airflow-configmap
           configMap:
-            name: airflow-scripts
-            defaultMode: 0755
-        - name: dags-data
-          emptyDir: {}
-        - emptyDir: {}
-          name: synchronised-dags
+            name: airflow-configmap
