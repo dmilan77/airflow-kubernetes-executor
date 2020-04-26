@@ -35,7 +35,7 @@ spec:
       serviceAccountName: airflow
       containers:
         - name: airflow-web
-          image: dmilan/docker-airflow-v2:v1
+          image: apache/airflow:1.10.10
           imagePullPolicy: IfNotPresent
           ports:
             - name: web

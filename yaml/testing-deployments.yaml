@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airflow-scheduler
+  name: airflow-test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      name: airflow-scheduler
+      name: airflow-test
   template:
     metadata:
        labels:
-         name: airflow-scheduler
+         name: airflow-test
     spec:
       restartPolicy: Always
       serviceAccountName: airflow
@@ -37,6 +37,12 @@ spec:
             - "bash"
             - "-c"
             - >
+              ls -l ${AIRFLOW_HOME}/airflow.cfg &&
+              env && 
+              echo 'waiting 10s...' &&
+              sleep 2 &&
+              mkdir -p /opt/airflow/.local/bin &&
+              export PATH=/opt/airflow/.local/bin:$PATH &&
               echo "executing initdb" &&
               airflow initdb &&
               echo "executing scheduler" &&

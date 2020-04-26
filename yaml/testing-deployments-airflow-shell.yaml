@@ -1,0 +1,27 @@
+# Source: airflow/templates/deployments-scheduler.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-shell
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: airflow-shell
+  template:
+    metadata:
+       labels:
+         name: airflow-shell
+    spec:
+      restartPolicy: Always
+      serviceAccountName: airflow
+      containers:
+        - name: airflow-scheduler
+          image: apache/airflow:1.10.10
+          imagePullPolicy: IfNotPresent
+          command:
+            - "bash"
+            - "-c"
+            - >
+              echo 'starting ... ' &&
+              tail -f /dev/null
