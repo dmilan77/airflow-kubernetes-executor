@@ -1,3 +1,5 @@
  #!/bin/bash
- export KUBECTL_NAMESPACE="default"
- alias akubectl='kubectl --context="$KUBECTL_CONTEXT" --namespace="$KUBECTL_NAMESPACE"'
+ shopt -s expand_aliases
+ export KUBECTL_NAMESPACE="airflow"
+ alias akubectl='kubectl --namespace="$KUBECTL_NAMESPACE"'
+ echo "Init scripts done ..."
