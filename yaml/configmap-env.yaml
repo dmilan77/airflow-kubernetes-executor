@@ -12,16 +12,13 @@ data:
   ## Force UTC timezone
   TZ: Etc/UTC
   ## Postgres DB configuration
-  POSTGRES_HOST: "postgres-service.default.svc.cluster.local"
-  POSTGRES_PORT: "5432"
-  POSTGRES_DB: "airflow"
+  # POSTGRES_HOST: "postgres-service.default.svc.cluster.local"
+  # POSTGRES_PORT: "5432"
+  # POSTGRES_DB: "airflow"
   AIRFLOW__CORE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://postgres:abc123@postgres-service.default.svc.cluster.local:5432/airflow"
-
-  # Configure puckel's docker-airflow entrypoint
-  EXECUTOR: "Kubernetes"
   FERNET_KEY: "SKJOM8uzLY6xAxPt8qFN2BcprPl-iPz_tMt9ktmfd_E="
-  DO_WAIT_INITDB: "false"
   ## Custom Airflow settings
+  AIRFLOW__CORE__EXECUTOR: "KubernetesExecutor" 
   AIRFLOW__CORE__DONOT_PICKLE: "false"
   AIRFLOW__CORE__DAGS_FOLDER: "/opt/airflow/dags"
   AIRFLOW__CORE__BASE_LOG_FOLDER: "/opt/airflow/logs"
@@ -46,7 +43,7 @@ data:
   
   AIRFLOW__KUBERNETES__DELETE_WORKER_PODS: "false"
   AIRFLOW__KUBERNETES__GIT_BRANCH: "master"
-  AIRFLOW__KUBERNETES__GIT_DAGS_FOLDER_MOUNT_POINT: "/opt/airflow"
+  AIRFLOW__KUBERNETES__GIT_DAGS_FOLDER_MOUNT_POINT: "/opt/airflow/dags"
   AIRFLOW__KUBERNETES__GIT_REPO: "https://github.com/dmilan77/test-airflow-dag.git"
   AIRFLOW__KUBERNETES__GIT_SYNC_DEST: "dags"
   AIRFLOW__KUBERNETES__GIT_SYNC_RUN_AS_USER: "0"
