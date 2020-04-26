@@ -6,9 +6,6 @@ metadata:
   labels:
     app: airflow
     component: web
-    chart: airflow-0.1
-    release: airflow
-    heritage: Helm
 spec:
   replicas: 1
   minReadySeconds: 120
@@ -97,9 +94,21 @@ spec:
           timeoutSeconds: 1
           successThreshold: 1
           failureThreshold: 5
-      # volumes:
-      #   - name: airflow-configmap
-      #     configMap:
-      #       name: airflow-configmap
-      #   - name: dag-folder
-      #     emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: airflow
+    component: web
+  name: airflow-web
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: airflow
+    component: web
+    release: airflow
