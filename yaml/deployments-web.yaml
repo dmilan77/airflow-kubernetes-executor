@@ -46,13 +46,13 @@ spec:
         # - name: GIT_SYNC_DEST
         #   value: dags
       - name: web
-        image: apache/airflow:1.10.10
+        image: apache/airflow:1.10.10-python3.7
         volumeMounts:
         - name: airflow-configmap
           mountPath: /opt/airflow/airflow.cfg
           subPath: airflow.cfg  
         - name: dag-folder
-          mountPath: /opt/airflow
+          mountPath: /user/airflow/user
         imagePullPolicy: IfNotPresent
         ports:
           - name: web
@@ -106,4 +106,3 @@ spec:
   selector:
     app: airflow
     component: web
-    release: airflow

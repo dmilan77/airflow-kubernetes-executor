@@ -33,10 +33,10 @@ spec:
         # - name: GIT_SYNC_DEST
         #   value: dags      
         - name: scheduler
-          image: apache/airflow:1.10.10
+          image: apache/airflow:1.10.10-python3.7
           volumeMounts:
           - name: dag-folder
-            mountPath: /opt/airflow  
+            mountPath: /user/airflow/user  
           - name: airflow-configmap
             mountPath: /opt/airflow/airflow.cfg
             subPath: airflow.cfg
