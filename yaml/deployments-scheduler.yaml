@@ -16,13 +16,27 @@ spec:
       restartPolicy: Always
       serviceAccountName: airflow
       volumes:
+        - name: dag-folder
+          emptyDir: {}      
         - name: airflow-configmap
           configMap:
             name: airflow-configmap
       containers:
-        - name: airflow-scheduler
+        - name: git-sync
+          image: k8s.gcr.io/git-sync:v3.1.5
+          volumeMounts:
+          - name: dag-folder
+            mountPath: /git
+          envFrom:
+            - configMapRef:
+                name: "airflow-env"
+        # - name: GIT_SYNC_DEST
+        #   value: dags      
+        - name: scheduler
           image: apache/airflow:1.10.10
           volumeMounts:
+          - name: dag-folder
+            mountPath: /git          
           - name: airflow-configmap
             mountPath: /opt/airflow/airflow.cfg
             subPath: airflow.cfg
@@ -37,6 +51,9 @@ spec:
             - "bash"
             - "-c"
             - >
+              echo "setting up dag mount ... " &&
+              rm -rf /opt/airflow/dags &&
+              ln -s /git/sync/dags /opt/airflow/dags &&
               echo "executing initdb" &&
               airflow initdb &&
               echo "executing scheduler" &&

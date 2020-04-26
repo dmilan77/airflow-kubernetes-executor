@@ -33,52 +33,73 @@ spec:
     spec:
       restartPolicy: Always
       serviceAccountName: airflow
-      containers:
-        - name: airflow-web
-          image: apache/airflow:1.10.10
-          volumeMounts:
-          - name: airflow-configmap
-            mountPath: /opt/airflow/airflow.cfg
-            subPath: airflow.cfg          
-          imagePullPolicy: IfNotPresent
-          ports:
-            - name: web
-              containerPort: 8080
-              protocol: TCP
-          envFrom:
-            - configMapRef:
-                name: "airflow-env"
-          env:          
-            - name: POSTGRES_USER
-              value: "postgres"
-          command:
-            - "bash"
-            - "-c"
-            - >
-              echo 'executing webserver...' &&
-              airflow webserver
-          livenessProbe:
-            httpGet:
-              path: "/health"
-              port: web
-            ## Keep 6 minutes the delay to allow clean wait of postgres and redis containers
-            initialDelaySeconds: 120
-            periodSeconds: 20
-            timeoutSeconds: 1
-            successThreshold: 1
-            failureThreshold: 5
-          readinessProbe:
-            httpGet:
-              path: "/health"
-              port: web
-            initialDelaySeconds: 120
-            periodSeconds: 20
-            timeoutSeconds: 1
-            successThreshold: 1
-            failureThreshold: 5
-        # - image: k8s.gcr.io/git-sync:v3.1.1
-        #   name: git-sync
       volumes:
+        - name: dag-folder
+          emptyDir: {}      
         - name: airflow-configmap
           configMap:
             name: airflow-configmap
+      containers:
+      - name: git-sync
+        image: k8s.gcr.io/git-sync:v3.1.5
+        volumeMounts:
+        - name: dag-folder
+          mountPath: /git
+        envFrom:
+          - configMapRef:
+              name: "airflow-env"
+        # - name: GIT_SYNC_DEST
+        #   value: dags
+      - name: web
+        image: apache/airflow:1.10.10
+        volumeMounts:
+        - name: airflow-configmap
+          mountPath: /opt/airflow/airflow.cfg
+          subPath: airflow.cfg  
+        - name: dag-folder
+          mountPath: /git
+          readOnly: true
+        imagePullPolicy: IfNotPresent
+        ports:
+          - name: web
+            containerPort: 8080
+            protocol: TCP
+        envFrom:
+          - configMapRef:
+              name: "airflow-env"
+        env:          
+          - name: POSTGRES_USER
+            value: "postgres"
+        command:
+          - "bash"
+          - "-c"
+          - >
+            echo 'executing webserver...' &&
+            rm -rf /opt/airflow/dags &&
+            ln -s /git/sync/dags /opt/airflow/dags &&
+            airflow webserver
+        livenessProbe:
+          httpGet:
+            path: "/health"
+            port: web
+          ## Keep 6 minutes the delay to allow clean wait of postgres and redis containers
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: "/health"
+            port: web
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 1
+          successThreshold: 1
+          failureThreshold: 5
+      # volumes:
+      #   - name: airflow-configmap
+      #     configMap:
+      #       name: airflow-configmap
+      #   - name: dag-folder
+      #     emptyDir: {}
