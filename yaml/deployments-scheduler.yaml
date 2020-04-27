@@ -36,7 +36,7 @@ spec:
           image: apache/airflow:1.10.10-python3.7
           volumeMounts:
           - name: dag-folder
-            mountPath: /user/airflow/user  
+            mountPath: /user/airflow
           - name: airflow-configmap
             mountPath: /opt/airflow/airflow.cfg
             subPath: airflow.cfg

@@ -52,7 +52,7 @@ spec:
           mountPath: /opt/airflow/airflow.cfg
           subPath: airflow.cfg  
         - name: dag-folder
-          mountPath: /user/airflow/user
+          mountPath: /user/airflow
         imagePullPolicy: IfNotPresent
         ports:
           - name: web
