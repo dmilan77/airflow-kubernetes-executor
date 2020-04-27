@@ -48,8 +48,6 @@ data:
   AIRFLOW__KUBERNETES__DELETE_WORKER_PODS: "True"
   AIRFLOW__KUBERNETES__GIT_REPO: "https://github.com/dmilan77/test-airflow-dag.git"
   AIRFLOW__KUBERNETES__GIT_BRANCH: "master"
-  # AIRFLOW__CORE__DAGS_FOLDER:  /user/airflow/gitmount/dags/gitmount/gitmount/dags
-  # /user/airflow/gitmount/dags/parallel_dag.py
   AIRFLOW__KUBERNETES__GIT_DAGS_FOLDER_MOUNT_POINT: "/user/airflow"
   AIRFLOW__KUBERNETES__GIT_SYNC_DEST: "gitmount"
   AIRFLOW__KUBERNETES__GIT_SYNC_ROOT: "/git"
